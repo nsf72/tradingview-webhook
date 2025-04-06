@@ -1,15 +1,15 @@
 from flask import Flask, request
 import requests
-import os
 
 app = Flask(__name__)
-LINE_NOTIFY_TOKEN = os.getenv("LINE_NOTIFY_TOKEN")
 
-def send_line_notify(message):
-    url = 'https://notify-api.line.me/api/notify'
-    headers = {'Authorization': f'Bearer {LINE_NOTIFY_TOKEN}'}
-    data = {'message': message}
-    return requests.post(url, headers=headers, data=data)
+DISCORD_WEBHOOK_URL = "https://discordapp.com/api/webhooks/1358346547061981284/dsR-W1YAc7ucrpkXA5RjuTj622CcJbVAeHLEKX-wcXOnGevgvHk5xQEecVCSnZ7x7RCn"
+
+def send_discord_message(message):
+    data = {
+        "content": message
+    }
+    return requests.post(DISCORD_WEBHOOK_URL, json=data)
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
@@ -18,7 +18,11 @@ def webhook():
     event = data.get("event", "No event")
     time = data.get("time", "N/A")
 
-    message = f"🚨 {symbol} 發生訊號\n🕒 {time}\n📢 {event}"
-    send_line_notify(message)
+    message = f"\ud83d\udea8 {symbol} \u767c\u751f\u8a0a\u865f\n\ud83d\udd52 {time}\n\ud83d\udce2 {event}"
+    send_discord_message(message)
 
     return {"status": "ok"}
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+
